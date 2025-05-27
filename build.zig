@@ -2,21 +2,21 @@ const std = @import("std");
 const Builder = std.Build;
 
 pub fn build(b: *std.Build) !void {
-    const uno = std.zig.CrossTarget{
+    const uno = b.standardTargetOptions(.{ .default_target = .{
         .cpu_arch = .avr,
         .cpu_model = .{ .explicit = &std.Target.avr.cpu.atmega328p },
         .os_tag = .freestanding,
         .abi = .none,
-    };
+    }});
 
     const exe = b.addExecutable(.{
         .name = "avr-arduino-zig",
-        .root_source_file = .{ .path = "src/start.zig" },
-        .target = b.resolveTargetQuery(uno),
+        .root_source_file = b.path("src/start.zig"),
+        .target = uno,
         .optimize = .ReleaseSafe,
     });
 
-    exe.setLinkerScriptPath(.{ .path = "src/linker.ld" });
+    exe.setLinkerScript(b.path("src/linker.ld"));
 
     b.installArtifact(exe);
 
